@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>BU Collection · Multi-claim instalment roadmap</title>
+<style>
+:root {
+  --bg: #f5f6f3;
+  --surface: #ffffff;
+  --ink: #17242e;
+  --muted: #5b6a74;
+  --line: #d9ded9;
+  --accent: #0f5f55;
+  --major-bg: #e3e7fb; --major-fg: #2b3a8f;
+  --quick-bg: #d9f1e2; --quick-fg: #12633a;
+  --fill-bg: #f6ecc9;  --fill-fg: #7a5a00;
+  --sink-bg: #f8dcd8;  --sink-fg: #922a1d;
+  --focus: #1a56db;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #11181d;
+    --surface: #1a242b;
+    --ink: #e7edf0;
+    --muted: #9aaab4;
+    --line: #2d3b44;
+    --accent: #5fc4b3;
+    --major-bg: #28306b; --major-fg: #c5ccff;
+    --quick-bg: #17432c; --quick-fg: #a8e7c4;
+    --fill-bg: #4a3d12;  --fill-fg: #f2dc93;
+    --sink-bg: #5a2018;  --sink-fg: #ffc3ba;
+    --focus: #8ab4ff;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #11181d;
+  --surface: #1a242b;
+  --ink: #e7edf0;
+  --muted: #9aaab4;
+  --line: #2d3b44;
+  --accent: #5fc4b3;
+  --major-bg: #28306b; --major-fg: #c5ccff;
+  --quick-bg: #17432c; --quick-fg: #a8e7c4;
+  --fill-bg: #4a3d12;  --fill-fg: #f2dc93;
+  --sink-bg: #5a2018;  --sink-fg: #ffc3ba;
+  --focus: #8ab4ff;
+}
+* { box-sizing: border-box; }
+html { color-scheme: light dark; }
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: "Segoe UI", system-ui, -apple-system, "Helvetica Neue", Arial, sans-serif;
+  line-height: 1.5;
+  -webkit-text-size-adjust: 100%;
+}
+:focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; }
+.wrap { max-width: 1180px; margin: 0 auto; padding: 32px 20px 64px; }
+
+header { display: flex; flex-wrap: wrap; gap: 16px; justify-content: space-between; align-items: flex-end; margin-bottom: 20px; }
+h1 { font-family: Georgia, "Times New Roman", serif; font-weight: 700; font-size: clamp(1.6rem, 3.4vw, 2.3rem); line-height: 1.15; margin: 0 0 6px; letter-spacing: -0.01em; }
+.sub { color: var(--muted); margin: 0; max-width: 62ch; }
+.theme { background: transparent; color: var(--ink); border: 1px solid var(--line); border-radius: 6px; padding: 8px 12px; font: inherit; font-size: .875rem; cursor: pointer; }
+.theme:hover { border-color: var(--accent); }
+
+.anchors { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 0; border: 1px solid var(--line); border-radius: 8px; background: var(--surface); margin-bottom: 24px; overflow: hidden; }
+.anchor { padding: 14px 16px; border-left: 1px solid var(--line); }
+.anchor:first-child { border-left: 0; }
+.anchor b { display: block; font-size: .8rem; color: var(--muted); font-weight: 600; margin-bottom: 2px; }
+.anchor span { font-size: .92rem; }
+
+.toolbar { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin-bottom: 20px; }
+.toolbar .lbl { font-size: .875rem; color: var(--muted); margin-right: 4px; }
+.chip { border: 1px solid var(--line); background: var(--surface); color: var(--ink); border-radius: 999px; padding: 6px 14px; font: inherit; font-size: .85rem; cursor: pointer; }
+.chip:hover { border-color: var(--accent); }
+.chip[aria-pressed="true"] { background: var(--ink); color: var(--bg); border-color: var(--ink); }
+
+.lanes { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; align-items: start; }
+.lane { background: color-mix(in srgb, var(--surface) 55%, var(--bg)); border: 1px solid var(--line); border-radius: 10px; padding: 14px; min-height: 180px; }
+.lane h2 { font-family: Georgia, "Times New Roman", serif; font-size: 1.25rem; margin: 0; display: flex; justify-content: space-between; align-items: baseline; }
+.lane h2 .count { font-family: "Segoe UI", system-ui, sans-serif; font-size: .8rem; color: var(--muted); font-weight: 400; }
+.lane .when { color: var(--muted); font-size: .85rem; margin: 2px 0 12px; }
+.lane.now { border-top: 4px solid var(--accent); }
+.lane.next { border-top: 4px solid var(--major-fg); }
+.lane.later { border-top: 4px solid var(--muted); }
+
+.card { background: var(--surface); border: 1px solid var(--line); border-radius: 8px; padding: 12px 14px; margin-bottom: 10px; }
+.card.hidden { display: none; }
+.card-top { display: flex; gap: 10px; align-items: flex-start; justify-content: space-between; }
+.card-title { margin: 0; font-size: .98rem; font-weight: 650; line-height: 1.3; }
+.card-title .id { color: var(--muted); font-weight: 600; margin-right: 6px; }
+.badge { display: inline-block; white-space: nowrap; font-size: .75rem; font-weight: 650; padding: 3px 9px; border-radius: 999px; }
+.q-major { background: var(--major-bg); color: var(--major-fg); }
+.q-quick { background: var(--quick-bg); color: var(--quick-fg); }
+.q-fill  { background: var(--fill-bg);  color: var(--fill-fg); }
+.q-sink  { background: var(--sink-bg);  color: var(--sink-fg); }
+.why { margin: 8px 0 0; font-size: .875rem; color: var(--muted); }
+.more { margin-top: 10px; background: none; border: 0; padding: 0; color: var(--accent); font: inherit; font-size: .82rem; font-weight: 600; cursor: pointer; text-decoration: underline; text-underline-offset: 3px; }
+.scores { display: none; margin-top: 10px; padding-top: 10px; border-top: 1px dashed var(--line); font-size: .82rem; }
+.card[data-open="true"] .scores { display: grid; gap: 8px; }
+.meter { display: grid; grid-template-columns: 52px 1fr 28px; gap: 8px; align-items: center; }
+.meter .bar { display: flex; gap: 3px; }
+.meter .bar i { flex: 1; height: 8px; border-radius: 2px; background: var(--line); }
+.meter .bar i.on { background: var(--accent); }
+.meter.eff .bar i.on { background: var(--muted); }
+.empty { border: 1px dashed var(--line); border-radius: 8px; padding: 16px; color: var(--muted); font-size: .88rem; }
+
+.cut { margin-top: 36px; }
+.cut h2 { font-family: Georgia, "Times New Roman", serif; font-size: 1.3rem; margin: 0 0 4px; }
+.cut > p { color: var(--muted); margin: 0 0 14px; font-size: .9rem; }
+.cut-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 14px; }
+.cut .card { border-left: 4px solid var(--sink-fg); }
+.cut .card .card-title { text-decoration: line-through; text-decoration-thickness: 1px; text-decoration-color: var(--muted); }
+
+.legend { margin-top: 32px; font-size: .82rem; color: var(--muted); display: flex; flex-wrap: wrap; gap: 8px 18px; align-items: center; }
+footer { margin-top: 24px; font-size: .8rem; color: var(--muted); }
+
+@media (max-width: 860px) {
+  .lanes { grid-template-columns: 1fr; }
+  .anchor { border-left: 0; border-top: 1px solid var(--line); }
+  .anchor:first-child { border-top: 0; }
+}
+@media (prefers-reduced-motion: no-preference) {
+  .chip, .card, .theme { transition: border-color .15s, background-color .15s; }
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div>
+      <h1>BU Collection roadmap: one plan for several claims</h1>
+      <p class="sub">Team: 4 people (3 developers: 1 frontend, 2 backend; 1 QA) over 6 weeks. Prioritised by Effort vs. Value for consumers with 2 or more open claims.</p>
+    </div>
+    <button class="theme" id="themeBtn" type="button">Switch theme</button>
+  </header>
+
+  <section class="anchors" aria-label="Strategic anchors">
+    <div class="anchor"><b>Persona</b><span>Consumer with 2+ open claims in the instalment journey</span></div>
+    <div class="anchor"><b>Primary metric</b><span>More multi-claim consumers finish one plan online (now 34.9%)</span></div>
+    <div class="anchor"><b>Moment of misery</b><span>Sees one claim at a time, so no single plan for everything she owes</span></div>
+    <div class="anchor"><b>Guardrail</b><span>Single-claim agreement (52.1%) falls no more than 3 points vs. control</span></div>
+  </section>
+
+  <div class="toolbar" role="group" aria-label="Filter by quadrant">
+    <span class="lbl">Show:</span>
+    <button class="chip" type="button" data-filter="all" aria-pressed="true">All</button>
+    <button class="chip" type="button" data-filter="quick" aria-pressed="false">Quick Win</button>
+    <button class="chip" type="button" data-filter="major" aria-pressed="false">Major Project</button>
+    <button class="chip" type="button" data-filter="fill" aria-pressed="false">Fill-In</button>
+    <button class="chip" type="button" data-filter="sink" aria-pressed="false">Time Sinker</button>
+  </div>
+
+  <main class="lanes" id="lanes">
+    <section class="lane now" aria-labelledby="h-now">
+      <h2 id="h-now">NOW <span class="count" data-count="now"></span></h2>
+      <p class="when">This sprint</p>
+      <div data-lane="now"></div>
+    </section>
+    <section class="lane next" aria-labelledby="h-next">
+      <h2 id="h-next">NEXT <span class="count" data-count="next"></span></h2>
+      <p class="when">The following sprints</p>
+      <div data-lane="next"></div>
+    </section>
+    <section class="lane later" aria-labelledby="h-later">
+      <h2 id="h-later">LATER <span class="count" data-count="later"></span></h2>
+      <p class="when">Backlog</p>
+      <div data-lane="later"></div>
+    </section>
+  </main>
+
+  <section class="cut" aria-labelledby="h-cut">
+    <h2 id="h-cut">Cut list</h2>
+    <p>Not built. Each one costs more than it returns against the persona's core friction.</p>
+    <div class="cut-grid" data-lane="cut"></div>
+  </section>
+
+  <div class="legend" aria-label="Quadrant legend">
+    <span><span class="badge q-quick">Quick Win</span> high value, low effort</span>
+    <span><span class="badge q-major">Major Project</span> high value, high effort</span>
+    <span><span class="badge q-fill">Fill-In</span> lower value, low effort</span>
+    <span><span class="badge q-sink">Time Sinker</span> lower value, high effort</span>
+  </div>
+  <footer>Select "Show scores" on a card to see its Value and Effort (1 to 5). Effort is judged against 3 developers, 1 QA and 6 weeks.</footer>
+</div>
+
+<script>
+(function () {
+  var features = [
+    { id: "B1", name: "One plan for several open claims", lane: "next", q: "major", v: 5, e: 4,
+      why: "It removes the moment of misery directly: the 2+ claim agreement rate (34.9% vs 52.1%) cannot move without it, and 17.3% of contacts ask for it." },
+    { id: "B2", name: "Plain explainer for why income is asked and how it is used", lane: "later", q: "fill", v: 2, e: 1,
+      why: "It is copy that answers 16.2% of contacts, but it is not specific to multi-claim consumers, so it won\u2019t move the primary metric alone." },
+    { id: "B4", name: "Handoff summary for the agent when a consumer calls", lane: "later", q: "fill", v: 2, e: 2,
+      why: "It lowers cost per call but does nothing to get her to finish online, which is the metric." },
+    { id: "B5", name: "Photo upload that works on mobile, or skip the document under a set amount", lane: "later", q: "quick", v: 3, e: 2,
+      why: "The income document step loses 22.1% of starters, 78.5% of starters are on mobile and 12.8% of calls are upload problems, so it lifts multi-claim completion indirectly." },
+    { id: "B6", name: "Pick a payment date that matches pay day", lane: "later", q: "fill", v: 2, e: 2,
+      why: "It targets plan survival for variable-income users (22.5% missed payments), not whether a multi-claim consumer finishes, so it protects quality more than it moves the primary metric." },
+    { id: "B7", name: "Show the shortest plan first to raise recovery", lane: "later", q: "fill", v: 1, e: 1,
+      why: "It is a Sales preference that raises the instalment, works against \u201Cwants lower monthly amount\u201D (14.7% of calls) and risks the missed-payment guardrail." },
+    { id: "B3", name: "Affordability check before the plan options", lane: "cut", q: "sink", v: 2, e: 4,
+      why: "An extra step before the options adds friction for single-claim users (guardrail risk) and the journey already asks affordability questions." },
+    { id: "B8", name: "Chat assistant on every portal page", lane: "cut", q: "sink", v: 2, e: 4,
+      why: "Chat users agree more (53.3%) but miss more (21.6%), probably through self-selection, and a new surface on every page is a heavy QA load that doesn\u2019t touch the one-plan friction." }
+  ];
+  var labels = { quick: "Quick Win", major: "Major Project", fill: "Fill-In", sink: "Time Sinker" };
+  var emptyText = {
+    now: "Nothing is committed this sprint. B1 is the first item in NEXT.",
+    next: "Nothing in this lane for the selected quadrant.",
+    later: "Nothing in this lane for the selected quadrant.",
+    cut: "Nothing cut for the selected quadrant."
+  };
+
+  function el(tag, cls, text) {
+    var n = document.createElement(tag);
+    if (cls) n.className = cls;
+    if (text) n.textContent = text;
+    return n;
+  }
+  function meter(label, value, cls) {
+    var row = el("div", "meter " + cls);
+    row.appendChild(el("span", "", label));
+    var bar = el("div", "bar");
+    for (var i = 1; i <= 5; i++) bar.appendChild(el("i", i <= value ? "on" : ""));
+    row.appendChild(bar);
+    row.appendChild(el("span", "", value + "/5"));
+    return row;
+  }
+  function card(f) {
+    var c = el("article", "card");
+    c.setAttribute("data-q", f.q);
+    c.setAttribute("data-open", "false");
+    var top = el("div", "card-top");
+    var h = el("h3", "card-title");
+    h.appendChild(el("span", "id", f.id));
+    h.appendChild(document.createTextNode(f.name));
+    top.appendChild(h);
+    top.appendChild(el("span", "badge q-" + f.q, labels[f.q]));
+    c.appendChild(top);
+    c.appendChild(el("p", "why", f.why));
+    var scores = el("div", "scores");
+    scores.id = "sc-" + f.id;
+    scores.appendChild(meter("Value", f.v, "val"));
+    scores.appendChild(meter("Effort", f.e, "eff"));
+    c.appendChild(scores);
+    var btn = el("button", "more", "Show scores");
+    btn.type = "button";
+    btn.setAttribute("aria-expanded", "false");
+    btn.setAttribute("aria-controls", scores.id);
+    btn.addEventListener("click", function () {
+      var open = c.getAttribute("data-open") === "true";
+      c.setAttribute("data-open", open ? "false" : "true");
+      btn.setAttribute("aria-expanded", open ? "false" : "true");
+      btn.textContent = open ? "Show scores" : "Hide scores";
+    });
+    c.appendChild(btn);
+    return c;
+  }
+
+  var filter = "all";
+  function render() {
+    ["now", "next", "later", "cut"].forEach(function (lane) {
+      var host = document.querySelector('[data-lane="' + lane + '"]');
+      host.innerHTML = "";
+      var all = features.filter(function (f) { return f.lane === lane; });
+      var shown = all.filter(function (f) { return filter === "all" || f.q === filter; });
+      shown.forEach(function (f) { host.appendChild(card(f)); });
+      if (!shown.length) {
+        var msg = (lane === "now" && filter === "all") ? emptyText.now : (lane === "now" ? "Nothing is committed this sprint." : emptyText[lane]);
+        host.appendChild(el("div", "empty", msg));
+      }
+      var cnt = document.querySelector('[data-count="' + lane + '"]');
+      if (cnt) cnt.textContent = all.length + (all.length === 1 ? " item" : " items");
+    });
+  }
+  render();
+
+  var chips = document.querySelectorAll(".chip");
+  chips.forEach(function (chip) {
+    chip.addEventListener("click", function () {
+      filter = chip.getAttribute("data-filter");
+      chips.forEach(function (c) { c.setAttribute("aria-pressed", c === chip ? "true" : "false"); });
+      render();
+    });
+  });
+
+  var root = document.documentElement;
+  document.getElementById("themeBtn").addEventListener("click", function () {
+    var current = root.getAttribute("data-theme");
+    if (!current) current = window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+    root.setAttribute("data-theme", current === "dark" ? "light" : "dark");
+  });
+})();
+</script>
+</body>
+</html>
