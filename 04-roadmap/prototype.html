@@ -1,1 +1,354 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Your open claims – one plan</title>
+<style>
+  /* Riverty Styleguide (220805), p.21 primary colors, p.24 combinations, p.69 app screens */
+  :root{
+    --vanguard:#527A42;   /* p.21 */
+    --charcoal:#282828;   /* p.21 */
+    --haze:#E7E4E2;       /* p.21 */
+    --ember:#EF706B;      /* p.21, highlight only */
+    --tint-charcoal-25:#C9C9C9; /* p.22 secondary tint, used for borders only */
+    --ink:var(--charcoal); --muted:var(--charcoal); --line:var(--tint-charcoal-25);
+    --bg:var(--haze); --card:#ffffff;
+    --accent:var(--vanguard); --accent-d:var(--vanguard);
+    --tbd-bg:#fff8c5; --tbd-ink:#6b5a00;
+    /* TBD: GT Ultra (licensed) is not embedded; fallback stack is a prototype assumption */
+    --body:"GT Ultra Standard","GT Ultra","Lucida Sans","Lucida Grande",system-ui,-apple-system,"Segoe UI",sans-serif;
+    --head:"GT Ultra Median","GT Ultra","Lucida Sans","Lucida Grande",system-ui,-apple-system,"Segoe UI",sans-serif;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0}
+  body{font:16px/1.5 var(--body);color:var(--charcoal);background:var(--haze);-webkit-text-size-adjust:100%}
+  .app{max-width:480px;margin:0 auto;min-height:100vh;background:var(--haze);display:flex;flex-direction:column}
+  header.top{padding:16px 18px 0;font-family:var(--head);letter-spacing:4px;text-transform:uppercase;font-size:14px;color:var(--charcoal)}
+  main{padding:10px 18px 28px;flex:1}
+  h1{font-family:var(--head);font-weight:400;font-size:30px;line-height:1.15;margin:10px 0 14px;color:var(--vanguard)}
+  h2{font-family:var(--head);font-weight:400;font-size:19px;margin:22px 0 8px;color:var(--vanguard)}
+  .card{background:var(--card);border-radius:4px;padding:14px 16px;margin-bottom:10px}
+  .claim{display:flex;justify-content:space-between;gap:12px;align-items:flex-start}
+  .claim .name{font-weight:700}
+  .claim .ref{font-size:13px}
+  .amt{font-weight:700;white-space:nowrap;font-variant-numeric:tabular-nums}
+  .claim.off{background:transparent;border:1px dashed var(--tint-charcoal-25)}
+  .claim.off .reason{font-size:13px;margin-top:2px;font-weight:700}
+  .total{display:flex;justify-content:space-between;align-items:baseline;padding:10px 2px 14px}
+  .total .big{font-family:var(--head);font-size:44px;font-weight:400;letter-spacing:-.5px;color:var(--vanguard);font-variant-numeric:tabular-nums}
+  .btn{display:block;width:100%;border:0;border-radius:2px;padding:15px 16px;font:inherit;font-weight:700;font-size:17px;background:var(--vanguard);color:#fff;cursor:pointer}
+  .btn:hover{background:var(--charcoal)}
+  .btn:disabled{background:var(--haze);color:var(--charcoal);border:1px solid var(--tint-charcoal-25);cursor:not-allowed}
+  :focus-visible{outline:3px solid var(--charcoal);outline-offset:2px}
+  .talk{margin-top:14px;font-size:14px;text-align:center}
+  .tbd{background:var(--tbd-bg);color:var(--tbd-ink);padding:1px 5px;border-radius:2px;font-size:12px;font-weight:700;white-space:nowrap}
+  .sticky{position:sticky;top:0;z-index:5;background:var(--charcoal);color:var(--haze);padding:10px 18px;display:flex;justify-content:space-between;align-items:baseline}
+  .sticky .v{font-family:var(--head);font-size:24px;font-variant-numeric:tabular-nums}
+  .back{background:none;border:0;color:var(--charcoal);font:inherit;font-weight:700;padding:6px 0;cursor:pointer;text-decoration:underline}
+  label{font-weight:700;display:block;margin-bottom:6px}
+  input[type=text]{width:100%;font:inherit;font-size:20px;padding:12px;border:2px solid var(--tint-charcoal-25);border-radius:2px;background:#fff;color:var(--charcoal)}
+  input[type=text][aria-invalid=true]{border-color:var(--ember)}
+  .err{color:var(--charcoal);background:#fff;border-left:6px solid var(--ember);border-radius:2px;padding:8px 10px;margin-top:8px;font-size:14px;font-weight:700}
+  .plan{width:100%;text-align:left;font:inherit;color:inherit;background:var(--card);border:2px solid transparent;border-radius:4px;padding:12px 16px;margin-bottom:10px;cursor:pointer;display:block}
+  .plan .row{display:flex;justify-content:space-between;align-items:baseline}
+  .plan .m{font-family:var(--head);font-size:26px;font-variant-numeric:tabular-nums}
+  .plan .sub{font-size:14px}
+  .plan[aria-pressed=true]{border-color:var(--vanguard)}
+  .plan:disabled{background:transparent;border:1px dashed var(--tint-charcoal-25);cursor:not-allowed}
+  .plan:disabled .m{text-decoration:line-through}
+  .plan .why{font-size:13px;font-weight:700;background:#fff;border-left:6px solid var(--ember);padding:4px 8px;margin-top:6px;display:inline-block}
+  .notice{background:#fff;border-left:6px solid var(--ember);border-radius:2px;padding:12px 14px;margin:10px 0;font-weight:700}
+  table{width:100%;border-collapse:collapse;font-size:15px}
+  td{padding:5px 0;vertical-align:top}
+  td.r{text-align:right;font-variant-numeric:tabular-nums;font-weight:700}
+  tr.sum td{border-top:1px solid var(--tint-charcoal-25);font-weight:700;padding-top:8px}
+  .letters{background:#fff;border-left:6px solid var(--vanguard);padding:12px 14px;border-radius:2px;margin-top:12px}
+  .ok{width:52px;height:52px;border-radius:50%;background:var(--vanguard);color:#fff;display:grid;place-items:center;font-size:28px;font-weight:700;margin:6px 0 10px}
+  .ref-id{font-family:var(--head);font-size:26px;letter-spacing:1px;color:var(--vanguard)}
+  .demo{border-top:1px dashed var(--tint-charcoal-25);padding:10px 18px;font-size:12px;display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+  .demo select{font:inherit;font-size:12px;padding:3px}
+  @media (prefers-reduced-motion:no-preference){.plan,.btn{transition:background .15s,border-color .15s}}
+</style>
+</head>
+<body>
+<div class="app">
+  <header class="top">Riverty <span class="tbd" style="letter-spacing:0;text-transform:none">Logo, GT Ultra font: TBD</span></header>
+  <div id="sticky"></div>
+  <main id="main" aria-live="polite"></main>
+  <div class="demo">Prototype · synthetic data ·
+    <label style="display:inline;font-weight:400;margin:0">Demo set
+      <select id="demoSel">
+        <option value="2">2 eligible claims</option>
+        <option value="3">3 eligible claims</option>
+        <option value="1">1 eligible claim</option>
+      </select>
+    </label>
+  </div>
+</div>
 
+<script>
+(function(){
+  'use strict';
+
+  /* ---------- Single constants (TBD: confirm with Collections/Legal) ---------- */
+  var LETTERS_APPROVED = null; // replace with approved text once Legal confirms; null = not approved
+  var LETTERS_CONSERVATIVE = 'Letters about these claims may still arrive until your first payment is received.';
+  var MISSED_PAYMENT_LINE = 'If you miss a payment, we will contact you about the whole plan.';
+  var PHONE = '[phone number: TBD]';
+  var AFFORD_PCT = 30;                       // prototype assumption
+  var DURATIONS = [6, 9, 12];
+  var INCOME_MIN = 1, INCOME_MAX = 99999;
+  var TBD = '<span class="tbd">TBD: confirm with Collections/Legal</span>';
+  function lettersText(){ return LETTERS_APPROVED || LETTERS_CONSERVATIVE; }
+
+  /* ---------- Synthetic data (cents) ---------- */
+  function demoClaims(n){
+    var all = [
+      {id:'c1', creditor:'Northwind Telecom',  ref:'NW-20418', cents:41200, eligible:true},
+      {id:'c2', creditor:'Northwind Telecom',  ref:'NW-20733', cents:26850, eligible:true},
+      {id:'c3', creditor:'Northwind Telecom',  ref:'NW-21090', cents:9575,  eligible:true},
+      {id:'c4', creditor:'Northwind Telecom',  ref:'NW-19877', cents:18900, eligible:false, reason:'Disputed, so not in this plan'}
+    ];
+    if (n === 3) return all;
+    if (n === 1) return [all[0], all[3]];
+    return [all[0], all[1], all[3]];
+  }
+
+  /* ---------- State (memory only) ---------- */
+  var state;
+  function freshState(n){
+    return {screen:1, demo:n||2, claims:demoClaims(n||2), incomeText:'', chosen:null, confirmed:false, agreement:null};
+  }
+  state = freshState(2);
+
+  /* ---------- Money helpers ---------- */
+  function eur(c){
+    var neg = c<0; c = Math.abs(c);
+    var s = Math.floor(c/100).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+    return (neg?'-':'') + '€' + s + '.' + ('0'+(c%100)).slice(-2);
+  }
+  function eligible(){ return state.claims.filter(function(c){return c.eligible;}); }
+  function ineligible(){ return state.claims.filter(function(c){return !c.eligible;}); }
+  function totalCents(){ return eligible().reduce(function(a,c){return a+c.cents;},0); }
+
+  function parseIncome(t){
+    var s = String(t).trim().replace(/,/g,'');
+    if (s === '' || !/^\d+(\.\d{1,2})?$/.test(s)) return {ok:false};
+    var v = parseFloat(s);
+    if (!(v >= INCOME_MIN && v <= INCOME_MAX)) return {ok:false};
+    return {ok:true, value:v, cents:Math.round(v*100)};
+  }
+
+  /* FR4: instalment = ceil(total/months); last payment absorbs the difference */
+  function buildPlan(total, months){
+    var inst = Math.ceil(total / months);
+    var last = total - inst*(months-1);
+    return {months:months, inst:inst, last:last, total:total};
+  }
+  /* FR5: option above 30% of income cannot be chosen (compare largest payment) */
+  function affordable(plan, incomeValue){
+    return plan.inst*100 <= incomeValue*AFFORD_PCT*100; // cents*100 <= euros*30*100 -> inst <= income*30 (cents)
+  }
+  /* FR6: pro rata split by balance; last claim absorbs rounding */
+  function split(amount, claims, total){
+    var out = [], used = 0;
+    claims.forEach(function(c,i){
+      var share = (i === claims.length-1) ? amount-used : Math.floor(amount*c.cents/total);
+      used += share; out.push({claim:c, cents:share});
+    });
+    return out;
+  }
+  function firstPaymentDate(){
+    var d = new Date(); d.setDate(d.getDate()+14);
+    return d.toLocaleDateString('en-GB',{day:'numeric',month:'long',year:'numeric'});
+  }
+
+  /* ---------- Events (console only) ---------- */
+  function track(name, data){ console.log('[event]', name, data||{}); }
+
+  /* ---------- Rendering ---------- */
+  var main = document.getElementById('main');
+  var sticky = document.getElementById('sticky');
+
+  function claimCard(c){
+    return '<div class="card claim"><div><div class="name">'+c.creditor+'</div><div class="ref">Reference '+c.ref+'</div></div><div class="amt">'+eur(c.cents)+'</div></div>';
+  }
+  function offCard(c){
+    return '<div class="card claim off"><div><div class="name">'+c.creditor+'</div><div class="ref">Reference '+c.ref+'</div><div class="reason">'+c.reason+'</div></div><div class="amt">'+eur(c.cents)+'</div></div>';
+  }
+
+  function render(){
+    sticky.innerHTML = '';
+    if (state.screen === 1) renderEntry();
+    else if (state.screen === 2) renderChoose();
+    else renderSuccess();
+    window.scrollTo(0,0);
+  }
+
+  /* Screen 1 */
+  function renderEntry(){
+    var el = eligible(), n = el.length;
+    if (n < 2){
+      main.innerHTML = '<h1>Your open claim</h1>' +
+        el.map(claimCard).join('') +
+        '<div class="notice">Only one claim is eligible, so the combined flow is not shown. The existing single-claim journey applies (outside this prototype).</div>' +
+        '<div class="talk">Prefer to talk to someone? '+PHONE+' '+TBD+'</div>';
+      return;
+    }
+    main.innerHTML =
+      '<h1>You have '+n+' open claims</h1>' +
+      '<div class="total"><span class="label">Total you owe</span><span class="big" id="grand">'+eur(totalCents())+'</span></div>' +
+      '<button class="btn" id="start">Set up one plan</button>' +
+      '<div class="talk">Prefer to talk to someone? '+PHONE+' '+TBD+'</div>' +
+      '<h2>Claims in this plan</h2>' +
+      el.map(claimCard).join('') +
+      (ineligible().length ? '<h2>Not in this plan</h2>' + ineligible().map(offCard).join('') : '');
+    document.getElementById('start').onclick = function(){
+      track('start', {claims:n, total:totalCents()});
+      state.screen = 2; render();
+    };
+  }
+
+  /* Screen 2 */
+  function renderChoose(){
+    var el = eligible();
+    sticky.innerHTML = '<div class="sticky"><span>Total you owe</span><span class="v">'+eur(totalCents())+'</span></div>';
+    main.innerHTML =
+      '<button class="back" id="back">Back</button>' +
+      '<h1>Choose one plan</h1>' +
+      '<label for="income">Monthly income (€)</label>' +
+      '<input type="text" id="income" inputmode="decimal" autocomplete="off" value="'+state.incomeText.replace(/"/g,'&quot;')+'">' +
+      '<div id="incomeErr"></div>' +
+      '<div id="plans"></div>' +
+      '<div id="review"></div>';
+    document.getElementById('back').onclick = function(){ state.screen = 1; render(); };
+    var inp = document.getElementById('income');
+    inp.oninput = function(){ state.incomeText = inp.value; refreshPlans(); };
+    refreshPlans();
+  }
+
+  function refreshPlans(){
+    var inc = parseIncome(state.incomeText);
+    var inp = document.getElementById('income');
+    var errBox = document.getElementById('incomeErr');
+    var plansBox = document.getElementById('plans');
+    var reviewBox = document.getElementById('review');
+
+    if (!inc.ok){
+      state.chosen = null;
+      inp.setAttribute('aria-invalid', state.incomeText.trim()===''?'false':'true');
+      errBox.innerHTML = state.incomeText.trim()===''
+        ? '<div class="err" role="alert">Enter your monthly income to see your plan options.</div>'
+        : '<div class="err" role="alert">Enter a number between '+INCOME_MIN+' and 99,999.</div>';
+      plansBox.innerHTML = ''; reviewBox.innerHTML = '';
+      return;
+    }
+    inp.setAttribute('aria-invalid','false');
+    errBox.innerHTML = '';
+
+    var total = totalCents();
+    var plans = DURATIONS.map(function(m){
+      var p = buildPlan(total, m); p.ok = affordable(p, inc.value); return p;
+    });
+
+    // If chosen plan is now unaffordable, clear the choice
+    if (state.chosen){
+      var cur = plans.filter(function(p){return p.months===state.chosen;})[0];
+      if (!cur || !cur.ok) state.chosen = null;
+    }
+
+    var anyOk = plans.some(function(p){return p.ok;});
+    var html = '<h2>Pick a monthly amount</h2>';
+    plans.forEach(function(p){
+      html += '<button class="plan" data-m="'+p.months+'" aria-pressed="'+(state.chosen===p.months)+'"'+(p.ok?'':' disabled')+'>' +
+        '<div class="row"><span class="m">'+eur(p.inst)+' <span class="sub">per month</span></span><span class="sub">'+p.months+' payments</span></div>' +
+        '<div class="sub">'+(p.last!==p.inst ? 'Last payment '+eur(p.last)+' · ' : '')+'Total '+eur(p.total)+'</div>' +
+        (p.ok?'':'<div class="why">Higher than we suggest for your income</div>') +
+        '</button>';
+    });
+    if (!anyOk){
+      html += '<div class="notice" role="alert">None of the options fit your income. We can’t set up a plan here. Please talk to someone: '+PHONE+' '+TBD+'</div>';
+    }
+    plansBox.innerHTML = html;
+
+    Array.prototype.forEach.call(plansBox.querySelectorAll('.plan'), function(b){
+      b.onclick = function(){
+        state.chosen = parseInt(b.getAttribute('data-m'),10);
+        track('plan_chosen', {months:state.chosen, total:total});
+        refreshPlans();
+        var r = document.getElementById('review'); if (r && r.scrollIntoView) r.scrollIntoView({behavior:'smooth', block:'nearest'});
+      };
+    });
+
+    renderReview(plans);
+  }
+
+  function renderReview(plans){
+    var box = document.getElementById('review');
+    if (!state.chosen){ box.innerHTML = ''; return; }
+    var p = plans.filter(function(x){return x.months===state.chosen;})[0];
+    var el = eligible(), total = totalCents();
+    var parts = split(p.inst, el, total);
+    var rows = el.map(function(c){ return '<tr><td>'+c.creditor+'<br><span class="ref" style="font-size:13px">'+c.ref+'</span></td><td class="r">'+eur(c.cents)+'</td></tr>'; }).join('');
+    var splitRows = parts.map(function(s){ return '<tr><td>'+s.claim.ref+'</td><td class="r">'+eur(s.cents)+'</td></tr>'; }).join('');
+    box.innerHTML =
+      '<h2>Review your plan</h2>' +
+      '<div class="card">' +
+        '<strong>This plan covers '+el.length+' claims</strong>' +
+        '<table>'+rows+'<tr class="sum"><td>Total</td><td class="r">'+eur(total)+'</td></tr></table>' +
+      '</div>' +
+      '<div class="card"><table>' +
+        '<tr><td>Monthly amount</td><td class="r">'+eur(p.inst)+'</td></tr>' +
+        '<tr><td>Number of payments</td><td class="r">'+p.months+'</td></tr>' +
+        (p.last!==p.inst?'<tr><td>Last payment</td><td class="r">'+eur(p.last)+'</td></tr>':'') +
+        '<tr><td>First payment date</td><td class="r">'+firstPaymentDate()+'</td></tr>' +
+      '</table></div>' +
+      '<div class="card"><strong>How each payment is split</strong><table>'+splitRows+'</table></div>' +
+      '<div class="letters"><strong>What happens to letters</strong><br>'+lettersText()+' '+(LETTERS_APPROVED?'':TBD)+'</div>' +
+      '<div style="height:12px"></div>' +
+      '<button class="btn" id="confirm"'+(state.confirmed?' disabled':'')+'>Confirm plan</button>';
+    document.getElementById('confirm').onclick = confirmPlan;
+  }
+
+  function confirmPlan(){
+    if (state.confirmed || state.agreement) return;   // one agreement only
+    state.confirmed = true;
+    var btn = document.getElementById('confirm'); if (btn) btn.disabled = true;
+    var p = buildPlan(totalCents(), state.chosen);
+    var id = 'AG-' + Math.floor(100000 + Math.random()*900000);
+    state.agreement = {id:id, plan:p, claims:eligible().slice(), date:firstPaymentDate()};
+    track('confirmed', {agreement:id, claims:state.agreement.claims.length, months:p.months, total:p.total});
+    state.screen = 3; render();
+  }
+
+  /* Screen 3 */
+  function renderSuccess(){
+    var a = state.agreement, p = a.plan;
+    var rows = a.claims.map(function(c){ return '<tr><td>'+c.creditor+'<br><span style="font-size:13px">'+c.ref+'</span></td><td class="r">'+eur(c.cents)+'</td></tr>'; }).join('');
+    main.innerHTML =
+      '<div class="ok" aria-hidden="true">✓</div>' +
+      '<h1>Your plan is set up</h1>' +
+      '<div class="card"><div class="ref" style="font-size:13px">Agreement reference</div><div class="ref-id">'+a.id+'</div></div>' +
+      '<div class="card"><strong>Claims covered by this plan</strong><table>'+rows+'<tr class="sum"><td>Total</td><td class="r">'+eur(p.total)+'</td></tr></table></div>' +
+      '<div class="card"><table>' +
+        '<tr><td>Monthly amount</td><td class="r">'+eur(p.inst)+'</td></tr>' +
+        '<tr><td>Number of payments</td><td class="r">'+p.months+'</td></tr>' +
+        (p.last!==p.inst?'<tr><td>Last payment</td><td class="r">'+eur(p.last)+'</td></tr>':'') +
+        '<tr><td>First payment date</td><td class="r">'+a.date+'</td></tr>' +
+      '</table></div>' +
+      '<div class="letters"><strong>What happens to letters</strong><br>'+lettersText()+' '+(LETTERS_APPROVED?'':TBD)+'</div>' +
+      '<div class="card" style="margin-top:12px"><strong>If you miss a payment</strong><br>'+MISSED_PAYMENT_LINE+' '+TBD+'</div>' +
+      '<p style="font-size:13px">Prototype only: no real payment or agreement was created.</p>';
+  }
+
+  /* Demo selector: resets to Screen 1 with fresh data */
+  document.getElementById('demoSel').onchange = function(e){
+    state = freshState(parseInt(e.target.value,10)); render();
+  };
+
+  render();
+})();
+</script>
+</body>
+</html>
