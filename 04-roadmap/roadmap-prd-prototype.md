@@ -1,41 +1,22 @@
-# Feature Roadmap, Module 4 · BU Collection
+# Roadmap, PRD & Prototype (Module 4)
 
-**Scenario:** Riverty BU Collection, A Fair Way Forward
+## Your strategic anchors
+- **Persona (M2), who are you solving for?:** A consumer with 2 or more open claims who enters the instalment journey.
+- **Primary success metric (M3), your leading indicator:** increase of multi-claim consumers to finish one plan online instead of leaving or calling an agentby 15%
+- **Moment of misery (M2), the specific friction blocking the goal:** the multi-claim consumer sees one claim at a time, so she can’t set up one plan for everything she owes, and can’t tell whether paying one claim stops letters about the others
+- **Guardrail metric (M3), what must not drop or break:** it must not fall by more than 3 points versus control.
 
-**Team:** [your assumed team size]
+## Scan the backlog & set a human baseline
+- **My instinctive “quick wins” before touching the AI (2 to 3 feature IDs + why):** Pick a payment date that matches pay day
+Plain explainer for why income is asked and how it is used
 
-## Strategic anchors
-- **Persona:** A consumer with 2 or more open claims who enters the instalment journey.
-- **Primary metric:** increase of multi-claim consumers to finish one plan online instead of leaving or calling an agentby 15%
-- **Moment of misery:** the multi-claim consumer sees one claim at a time, so she can’t set up one plan for everything she owes, and can’t tell whether paying one claim stops letters about the others
-- **Guardrail:** it must not fall by more than 3 points versus control.
+## Audit, override & decide
+- **Where did you override the AI? (feature + old vs. new score + why):** Chat assistant on every portal page - Time Sinker --> Later - supports the customer and prevents direct contacts
+- **Did the AI over-value a Sales/Eng request your M2 interviews don’t support?:** Photo upload that works on mobile, or skip the document under a set amount  was valued as 3 but there is no evidence
+- **Did it underweight something your M3 cohort/funnel data strongly supports?:** not really
 
-## Scoring
-| Feature | Value | Effort | Quadrant | Decision | Rationale |
-|---|---|---|---|---|---|
-| B1 One plan for several open claims | 5 | 4 | Major Project | Next | It removes the moment of misery directly: the 2+ claim agreement rate (34.9% vs 52.1%) cannot move without it, and 17.3% of contacts ask for it. |
-| B2 Plain explainer for why income is asked and how it is used | 2 | 1 | Fill-In | Later | It is copy that answers 16.2% of contacts, but it is not specific to multi-claim consumers, so it won’t move the primary metric alone. |
-| B3 Affordability check before the plan options | 2 | 4 | Time Sinker | Cut | An extra step before the options adds friction for single-claim users (guardrail risk) and the journey already asks affordability questions. |
-| B4 Handoff summary for the agent when a consumer calls | 2 | 2 | Fill-In | Later | It lowers cost per call but does nothing to get her to finish online, which is the metric. |
-| B5 Photo upload that works on mobile, or skip the document under a set amount | 3 | 2 | Fill-In | Later | The income document step loses 22.1% of starters, 78.5% of starters are on mobile and 12.8% of calls are upload problems, so it lifts multi-claim completion indirectly. |
-| B6 Pick a payment date that matches pay day	 | 2 | 1 | Fill-In | Later | It targets plan survival for variable-income users (22.5% missed payments), not whether a multi-claim consumer finishes, so it protects quality more than it moves the primary metric. |
-| B7 Show the shortest plan first to raise recovery	 | 1 | 1 | Fill-In | Later | It is a Sales preference that raises the instalment, works against “wants lower monthly amount” (14.7% of calls) and risks the missed-payment guardrail. |
-| B8 Chat assistant on every portal page | 2 | 4 | Time Sinker | Cut | Chat users agree more (53.3%) but miss more (21.6%), probably through self-selection, and a new surface on every page is a heavy QA load that doesn’t touch the one-plan friction. |
-
-## Roadmap
-### NOW, this sprint
-- _(none)_
-
-### NEXT, the following sprints
-- **B1 One plan for several open claims**, It removes the moment of misery directly: the 2+ claim agreement rate (34.9% vs 52.1%) cannot move without it, and 17.3% of contacts ask for it.
-
-### LATER, backlog
-- **B2 Plain explainer for why income is asked and how it is used**, It is copy that answers 16.2% of contacts, but it is not specific to multi-claim consumers, so it won’t move the primary metric alone.
-- **B4 Handoff summary for the agent when a consumer calls**, It lowers cost per call but does nothing to get her to finish online, which is the metric.
-- **B5 Photo upload that works on mobile, or skip the document under a set amount**, The income document step loses 22.1% of starters, 78.5% of starters are on mobile and 12.8% of calls are upload problems, so it lifts multi-claim completion indirectly.
-- **B6 Pick a payment date that matches pay day	**, It targets plan survival for variable-income users (22.5% missed payments), not whether a multi-claim consumer finishes, so it protects quality more than it moves the primary metric.
-- **B7 Show the shortest plan first to raise recovery	**, It is a Sales preference that raises the instalment, works against “wants lower monthly amount” (14.7% of calls) and risks the missed-payment guardrail.
-
-### ✂ Cut List
-- **B3 Affordability check before the plan options**, An extra step before the options adds friction for single-claim users (guardrail risk) and the journey already asks affordability questions.
-- **B8 Chat assistant on every portal page**, Chat users agree more (53.3%) but miss more (21.6%), probably through self-selection, and a new surface on every page is a heavy QA load that doesn’t touch the one-plan friction.
+## Generate your interactive roadmap
+- **My “Now” lane (this sprint), the 2 to 3 quick wins I’ll build first:** none
+- **What I cut, and the “no” I’m protecting the scope from:** Affordability check before the plan options
+Chat assistant on every portal page
+- **Prototype/roadmap screenshot link (paste into your deliverables):** https://github.com/pfeif07/pm-final-project/blob/main/04-roadmap/bu-collection-roadmap.html
